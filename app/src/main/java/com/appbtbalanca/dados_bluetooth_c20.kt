@@ -59,8 +59,12 @@ class dados_bluetooth_c20 : AppCompatActivity() {
             // Salva os dados digitados nas preferências
             saveToPreferences(macID, macSerial)
 
-            val macAddress = decodeMac(macID, macSerial)
-            toggleBluetoothConnection(macAddress)
+            try {
+                val macAddress = decodeMac(macID, macSerial)
+                toggleBluetoothConnection(macAddress)
+            } catch (e: Exception) {
+                logTextView.text = "ID ou Serial digitado errado."
+            }
         }
     }
 
@@ -78,6 +82,7 @@ class dados_bluetooth_c20 : AppCompatActivity() {
     }
 
 
+    @Throws(Exception::class)
     private fun decodeMac(id: String, serial: String): String {
         val serialBytes: List<String> = if (serial.contains(":")) {
             serial.split(":")
