@@ -124,7 +124,7 @@
             android:layout_marginHorizontal="10dp"
             android:text="Conectar"
             android:textSize="24sp"
-            style="@style/CustomButton"/>
+            android:backgroundTint="#2e3092"/>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
