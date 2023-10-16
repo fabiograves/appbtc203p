@@ -29,6 +29,8 @@ class dados_bluetooth_c20 : AppCompatActivity() {
     private lateinit var macSerialEditText: EditText
     private lateinit var connectBluetoothButton: Button
     private lateinit var textViewDadosC20: TextView
+    private var lastDisplayedValue: String? = null
+
 
     companion object {
         const val REQUEST_BLUETOOTH_PERMISSIONS = 1
@@ -186,7 +188,7 @@ class dados_bluetooth_c20 : AppCompatActivity() {
                             }
 
                             receivedValues.add(data)
-                            if (receivedValues.size > 50) {
+                            if (receivedValues.size > 20) {
                                 receivedValues.removeFirst()
                             }
 
@@ -194,8 +196,12 @@ class dados_bluetooth_c20 : AppCompatActivity() {
                                 .eachCount()
                                 .maxByOrNull { it.value }?.key
 
-                            runOnUiThread {
-                                textViewDadosC20.text = mostFrequentValue ?: ""
+                            // Verificar se o valor mais frequente é diferente do último valor exibido
+                            if (mostFrequentValue != lastDisplayedValue) {
+                                runOnUiThread {
+                                    textViewDadosC20.text = mostFrequentValue ?: ""
+                                }
+                                lastDisplayedValue = mostFrequentValue
                             }
 
                             readCounter++ // incrementar contador
@@ -209,7 +215,7 @@ class dados_bluetooth_c20 : AppCompatActivity() {
                         if (System.currentTimeMillis() - lastReadTime > 3000 || !isSocketConnected(bluetoothSocket)) {
                             runOnUiThread {
                                 disconnectBluetooth()
-                                textViewDadosC20.text = "" // Limpa os dados exibidos
+                                textViewDadosC20.text = lastDisplayedValue ?: "" // Use o último valor exibido aqui
                                 logTextView.text = "Conexão perdida"
                             }
                             return@Thread // Sai do thread
@@ -229,6 +235,7 @@ class dados_bluetooth_c20 : AppCompatActivity() {
             }
         }.start()
     }
+
 
     fun isSocketConnected(socket: BluetoothSocket?): Boolean {
         try {

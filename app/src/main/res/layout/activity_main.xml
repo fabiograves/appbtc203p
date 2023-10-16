@@ -33,6 +33,13 @@
             android:textAlignment="center"
             android:textSize="24sp" />
 
+        <View
+            android:id="@+id/divider4"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="?android:attr/listDivider"
+            android:visibility="invisible" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,7 +48,7 @@
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="316dp"
-                android:layout_height="331dp"
+                android:layout_height="239dp"
                 android:layout_weight="1"
                 app:srcCompat="@drawable/logocompleto" />
         </LinearLayout>

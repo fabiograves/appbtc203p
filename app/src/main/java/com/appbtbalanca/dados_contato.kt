@@ -30,7 +30,7 @@ class dados_contato : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s != null && s.length == 3) {
+                if (s != null && s.length == 2) {
                     editTextTelefone.setText("($s)")
                     editTextTelefone.setSelection(s.length + 2)
                 }
@@ -43,7 +43,7 @@ class dados_contato : AppCompatActivity() {
             val telefone = editTextTelefone.text.toString()
 
             if (nome.isBlank() || email.isBlank() || telefone.isBlank() ||
-                !email.contains("@") || telefone.length != 14) {
+                !email.contains("@") || telefone.length != 13) {
                 Toast.makeText(this, "Por favor, preencha todos os campos corretamente.", Toast.LENGTH_SHORT).show()
             } else {
                 sendEmail(nome, email, telefone)
@@ -54,7 +54,7 @@ class dados_contato : AppCompatActivity() {
     private fun sendEmail(nome: String, email: String, telefone: String) {
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "message/rfc822"
-        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("seuemail@dominio.com"))
+        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("seuemail@dominio.com", "outroemail@dominio.com"))
         intent.putExtra(Intent.EXTRA_SUBJECT, "Dados do Aplicativo")
         intent.putExtra(Intent.EXTRA_TEXT, "Nome: $nome\nE-mail: $email\nTelefone: $telefone")
 
