@@ -166,40 +166,78 @@ class dados_bluetooth_c20 : AppCompatActivity() {
             bluetoothSocket?.inputStream?.let { inputStream ->
                 val buffer = ByteArray(1024)
                 val receivedValues = LinkedList<String>()
+                var readCounter = 0 // contador
+                var lastReadTime = System.currentTimeMillis()
 
                 while (true) {
                     try {
                         val bytes = inputStream.read(buffer)
-                        var data = String(buffer, 0, bytes).trim()
+                        if (bytes > 0) {
+                            lastReadTime = System.currentTimeMillis() // Atualiza o último tempo de leitura
 
-                        // Remove unwanted characters, keep only numbers and dots
-                        data = data.replace(Regex("[^0-9.]"), "")
+                            var data = String(buffer, 0, bytes).trim()
 
-                        // If the last character is a dot, remove it
-                        if (data.endsWith(".")) {
-                            data = data.dropLast(1)
+                            // Remove remove os caracteres indesejados
+                            data = data.replace(Regex("[^0-9.]"), "")
+
+                            // Se o ultimo for ponto remove
+                            if (data.endsWith(".")) {
+                                data = data.dropLast(1)
+                            }
+
+                            receivedValues.add(data)
+                            if (receivedValues.size > 50) {
+                                receivedValues.removeFirst()
+                            }
+
+                            val mostFrequentValue = receivedValues.groupingBy { it }
+                                .eachCount()
+                                .maxByOrNull { it.value }?.key
+
+                            runOnUiThread {
+                                textViewDadosC20.text = mostFrequentValue ?: ""
+                            }
+
+                            readCounter++ // incrementar contador
+                            if (readCounter >= 500) {
+                                receivedValues.clear()
+                                readCounter = 0
+                            }
                         }
 
-                        receivedValues.add(data)
-                        if (receivedValues.size > 50) {
-                            receivedValues.removeFirst()
+                        // Verifica se passaram 3 segundos desde a última leitura
+                        if (System.currentTimeMillis() - lastReadTime > 3000 || !isSocketConnected(bluetoothSocket)) {
+                            runOnUiThread {
+                                disconnectBluetooth()
+                                textViewDadosC20.text = "" // Limpa os dados exibidos
+                                logTextView.text = "Conexão perdida"
+                            }
+                            return@Thread // Sai do thread
                         }
 
-                        val mostFrequentValue = receivedValues.groupingBy { it }
-                            .eachCount()
-                            .maxByOrNull { it.value }?.key
-
-                        runOnUiThread {
-                            textViewDadosC20.text = mostFrequentValue ?: ""
-                        }
-
-                        Thread.sleep(10) // Short pause to not overload the CPU
+                        Thread.sleep(10) // Pausa pra n dar over na cpu
                     } catch (e: IOException) {
                         e.printStackTrace()
+                        runOnUiThread {
+                            disconnectBluetooth()
+                            textViewDadosC20.text = ""
+                            logTextView.text = "Conexão perdida"
+                        }
+                        return@Thread
                     }
                 }
             }
         }.start()
+    }
+
+    fun isSocketConnected(socket: BluetoothSocket?): Boolean {
+        try {
+            val isConnectedMethod = BluetoothSocket::class.java.getDeclaredMethod("isConnected")
+            return isConnectedMethod.invoke(socket) as Boolean
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return false
     }
 
     private fun disconnectBluetooth() {
@@ -207,6 +245,7 @@ class dados_bluetooth_c20 : AppCompatActivity() {
             bluetoothSocket?.close()
             connectBluetoothButton.text = "Conectar"
             logTextView.text = "Bluetooth desconectado"
+            textViewDadosC20.text = ""
         } catch (e: IOException) {
             logTextView.text = "Erro ao desconectar o Bluetooth"
         }
