@@ -67,6 +67,6 @@
             android:layout_height="wrap_content"
             android:text="Proximo"
             android:textSize="24dp"
-            android:backgroundTint="#2e3092"/>
+            android:backgroundTint="#2d6653"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

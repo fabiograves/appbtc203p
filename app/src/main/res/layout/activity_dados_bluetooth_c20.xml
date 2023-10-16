@@ -127,7 +127,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="10dp"
-            android:backgroundTint="#2e3092"
+            android:backgroundTint="#2d6653"
             android:text="Conectar"
             android:textSize="24sp" />
 
